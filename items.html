@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Items — Bagr</title>
+<link rel="apple-touch-icon" href="logo-180.png">
+<link rel="icon" href="logo-32.png">
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Bagr">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-640x1136.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1242x2208.png" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1125x2436.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-828x1792.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1242x2688.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1170x2532.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1284x2778.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1179x2556.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1290x2796.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1206x2622.png" media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1320x2868.png" media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<meta name="theme-color" content="#171B24">
+<link rel="stylesheet" href="shared.css?v=5">
+<style>
+  .bags-row { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 1rem; }
+  .bag-chip {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    border: 2px solid var(--ink); border-radius: 999px;
+    padding: 0.4rem 0.5rem 0.4rem 0.7rem; font-size: 0.85rem; font-weight: 600;
+    background: white;
+  }
+  .bag-chip .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .bag-chip button {
+    background: none; border: none; color: var(--slate); cursor: pointer;
+    font-size: 0.9rem; line-height: 1; padding: 0;
+  }
+  .bag-chip button:hover { color: var(--stamp); }
+  .add-bag-row { display: flex; gap: 0.5rem; margin-bottom: 2rem; align-items: center; }
+  .add-bag-row input { padding: 0.5rem 0.75rem; border: 2px dashed var(--slate); border-radius: 999px; font-family: var(--body); font-size: 0.85rem; background: transparent; width: 160px; }
+  .add-bag-row input:focus { outline: none; border-color: var(--ink); }
+
+  .bag-group { margin-bottom: 1.75rem; }
+  .bag-group-header { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.75rem; }
+  .bag-group-header .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .bag-group-header h3 { font-size: 1rem; font-family: var(--body); font-weight: 700; }
+
+  .item-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+    padding: 0.9rem 1rem; border: 2px solid var(--ink); border-radius: var(--radius);
+    background: white; margin-bottom: 0.75rem;
+  }
+  .item-name { font-weight: 600; flex: 1; }
+  .forgotten-badge {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    font-family: var(--mono); font-size: 0.65rem; text-transform: uppercase;
+    color: var(--stamp); margin-left: 0.5rem;
+  }
+  .item-controls { display: flex; align-items: center; gap: 0.6rem; }
+  .delete-item-btn {
+    background: none; border: none; color: var(--slate); font-size: 1rem;
+    line-height: 1; cursor: pointer; padding: 0.2rem;
+  }
+  .delete-item-btn:hover { color: var(--stamp); }
+  .bag-select {
+    font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase;
+    border: 2px solid var(--ink); border-radius: var(--radius); padding: 0.35rem 0.4rem;
+    background: white; max-width: 110px;
+  }
+  .toggle { display: flex; border: 2px solid var(--ink); border-radius: var(--radius); overflow: hidden; font-family: var(--mono); font-size: 0.75rem; }
+  .toggle button { border: none; background: white; padding: 0.5rem 0.9rem; text-transform: uppercase; }
+  .toggle button.active.home { background: var(--amber); }
+  .toggle button.active.away { background: var(--stamp); color: white; }
+  .add-row { display: flex; gap: 0.75rem; margin-bottom: 2.5rem; }
+  .add-row input { flex: 1; padding: 0.7rem; border: 2px solid var(--ink); border-radius: var(--radius); font-family: var(--body); }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <nav class="app-nav"></nav>
+
+  <main class="app-main">
+    <h1 style="font-size:1.8rem; margin-bottom:0.4rem;">Your items</h1>
+    <p class="label" style="margin-bottom:1.5rem;">flag it the moment it moves</p>
+
+    <div id="pattern-insights"><!-- populated by JS --></div>
+
+    <div id="shared-bags"><!-- populated by JS, bags others shared with you --></div>
+
+    <p class="label" style="margin-bottom:0.6rem;">Bags</p>
+    <div class="bags-row" id="bags-row"><!-- populated by JS --></div>
+    <div class="add-bag-row">
+      <input id="new-bag-input" placeholder="e.g. Gym bag" maxlength="30">
+      <button class="btn outline" onclick="addBag()" style="padding:0.5rem 1rem; font-size:0.85rem;">+ New bag</button>
+    </div>
+
+    <div class="add-row">
+      <input id="new-item-input" placeholder="Add an item, e.g. Gym shoes">
+      <button class="btn" onclick="addItem()">Add</button>
+    </div>
+
+    <div id="item-list"><!-- populated by JS --></div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="shared.js?v=4"></script>
+<script>
+let session, items = [], bags = [];
+
+async function init() {
+  session = await requireSession();
+  if (!session) return;
+  renderDrawerNav('items');
+  [items, bags] = await Promise.all([fetchItems(session.user.id), fetchBags(session.user.id)]);
+  renderBags();
+  render();
+  renderPatternInsights();
+  renderSharedBags();
+}
+
+// Bagr Plus/Ultimate — "why do I keep forgetting this?" No AI call involved:
+// this is pure aggregation over `miss_events` (logged by track-misses each
+// day), computed right here in the browser. Free forever, gated only as a
+// product feature via the `subscriptions` tier check below.
+async function renderPatternInsights() {
+  const container = document.getElementById('pattern-insights');
+  if (!container) return;
+
+  const { data: sub } = await sb.from('subscriptions').select('tier').eq('user_id', session.user.id).maybeSingle();
+  const hasPlus = sub && (sub.tier === 'plus' || sub.tier === 'ultimate');
+  if (!hasPlus) {
+    container.innerHTML = `<p class="label" style="margin-bottom:1.5rem;">🔒 Pattern insights (which days you forget things most) are a <a href="upgrade.html">Bagr Plus</a> feature.</p>`;
+    return;
+  }
+
+  const { data: events } = await sb.from('miss_events').select('item_id, day_of_week').eq('user_id', session.user.id);
+  if (!events || events.length < 3) {
+    container.innerHTML = `<p class="label" style="margin-bottom:1.5rem;">Pattern insights unlock once Bagr has a bit more history on what you tend to forget.</p>`;
+    return;
+  }
+
+  const dayCounts = Array(7).fill(0);
+  events.forEach(e => dayCounts[e.day_of_week]++);
+  const worstDayIdx = dayCounts.indexOf(Math.max(...dayCounts));
+
+  const byItem = {};
+  events.forEach(e => {
+    byItem[e.item_id] = byItem[e.item_id] || { count: 0, days: Array(7).fill(0) };
+    byItem[e.item_id].count++;
+    byItem[e.item_id].days[e.day_of_week]++;
+  });
+  const topItemId = Object.keys(byItem).sort((a, b) => byItem[b].count - byItem[a].count)[0];
+  const topItem = items.find(i => i.id === Number(topItemId));
+  const topItemStats = byItem[topItemId];
+  const topItemDayIdx = topItemStats.days.indexOf(Math.max(...topItemStats.days));
+
+  container.innerHTML = `
+    <div class="card" style="margin-bottom:1.5rem;">
+      <h3 style="font-size:1.05rem; margin-bottom:0.6rem;">Pattern insights <span class="label">· Bagr Ultimate</span></h3>
+      <p style="margin-bottom:0.5rem;">You're most likely to forget something on <strong>${DAYS[worstDayIdx]}s</strong> (${dayCounts[worstDayIdx]} time${dayCounts[worstDayIdx] > 1 ? 's' : ''} so far).</p>
+      ${topItem ? `<p>Your <strong>${topItem.name}</strong> gets left behind most often — usually on <strong>${DAYS[topItemDayIdx]}s</strong> (${topItemStats.count} time${topItemStats.count > 1 ? 's' : ''} total).</p>` : ''}
+    </div>`;
+}
+
+function renderBags() {
+  const row = document.getElementById('bags-row');
+  if (!bags.length) {
+    row.innerHTML = `<span class="label">No bags yet — add one below.</span>`;
+    return;
+  }
+  row.innerHTML = bags.map(bag => `
+    <span class="bag-chip">
+      <span class="dot" style="background:${bag.color};"></span>
+      ${bag.name}
+      <button onclick="shareBag(${bag.id}, '${bag.name.replace(/'/g, "\\'")}')" aria-label="Share ${bag.name}" title="Share this bag">⇄</button>
+      <button onclick="removeBag(${bag.id})" aria-label="Delete ${bag.name}">&times;</button>
+    </span>
+  `).join('');
+}
+
+async function addBag() {
+  const input = document.getElementById('new-bag-input');
+  const name = input.value.trim();
+  if (!name) return;
+  const color = BAG_COLORS[bags.length % BAG_COLORS.length];
+  try {
+    const bag = await createBag(session.user.id, name, color);
+    bags.push(bag);
+    input.value = '';
+    renderBags();
+    render();
+  } catch (err) {
+    if (bags.length >= 2) {
+      alert("Free accounts get 2 bags. Upgrade to Bagr Ultimate for unlimited bags — head to the Upgrade tab.");
+    } else {
+      alert('Could not create that bag — please try again.');
+    }
+  }
+}
+
+async function removeBag(bagId) {
+  if (!confirm('Delete this bag? Items stay, just unassigned.')) return;
+  await deleteBag(bagId);
+  bags = bags.filter(b => b.id !== bagId);
+  items.forEach(i => { if (i.bag_id === bagId) i.bag_id = null; });
+  renderBags();
+  render();
+}
+
+// Bagr Ultimate — share a bag with someone else by email. They don't need to
+// have signed up yet; access activates the moment their email matches, same
+// pattern as Insiders. RLS enforces the Ultimate gate server-side — this
+// insert will fail for free-tier accounts no matter what the client sends.
+async function shareBag(bagId, bagName) {
+  const email = prompt(`Share "${bagName}" with (email address):`);
+  if (!email || !email.trim()) return;
+  const canEdit = confirm('Should they be able to toggle items home/away too?\n\nOK = view + edit\nCancel = view only');
+
+  const { error } = await sb.from('bag_shares').insert({
+    bag_id: bagId,
+    owner_user_id: session.user.id,
+    shared_with_email: email.trim().toLowerCase(),
+    permission: canEdit ? 'edit' : 'view',
+  });
+
+  if (error) {
+    if (error.code === '42501' || /row-level security/i.test(error.message || '')) {
+      alert('Sharing bags is a Bagr Ultimate feature — head to the Upgrade tab.');
+    } else {
+      alert("Couldn't share that bag — check the email address and try again.");
+    }
+    return;
+  }
+  alert(`Shared "${bagName}" with ${email.trim()}.`);
+}
+
+// Bags other people have shared with YOU. Read via bag_shares (RLS lets you
+// see rows naming your own email), then bags/items directly — no edge
+// function needed, the shared-bag RLS policies added alongside this feature
+// already scope access correctly.
+async function renderSharedBags() {
+  const container = document.getElementById('shared-bags');
+  if (!container || !session.user.email) return;
+
+  const { data: shares } = await sb.from('bag_shares')
+    .select('bag_id, permission')
+    .eq('shared_with_email', session.user.email.toLowerCase());
+
+  if (!shares || !shares.length) {
+    container.innerHTML = '';
+    return;
+  }
+
+  const sections = await Promise.all(shares.map(async (share) => {
+    const [{ data: bag }, { data: sharedItems }] = await Promise.all([
+      sb.from('bags').select('*').eq('id', share.bag_id).maybeSingle(),
+      sb.from('items').select('*').eq('bag_id', share.bag_id),
+    ]);
+    if (!bag) return '';
+
+    const rows = (sharedItems || []).map(item => `
+      <div class="item-row">
+        <span class="item-name">${item.name}</span>
+        <div class="item-controls">
+          ${share.permission === 'edit'
+            ? `<div class="toggle">
+                 <button class="${item.location === 'home' ? 'active home' : ''}" onclick="setSharedLoc(${item.id}, 'home')">Home</button>
+                 <button class="${item.location === 'away' ? 'active away' : ''}" onclick="setSharedLoc(${item.id}, 'away')">Packed</button>
+               </div>`
+            : `<span class="label">${item.location === 'home' ? 'Home' : 'Packed'}</span>`}
+        </div>
+      </div>`).join('');
+
+    return `
+      <div class="bag-group">
+        <div class="bag-group-header">
+          <span class="dot" style="background:${bag.color};"></span>
+          <h3>${bag.name} <span class="label">· shared with you (${share.permission})</span></h3>
+        </div>
+        ${rows || `<p class="label">No items in this bag yet.</p>`}
+      </div>`;
+  }));
+
+  container.innerHTML = sections.filter(Boolean).join('');
+}
+
+async function setSharedLoc(itemId, location) {
+  await sb.from('items').update({ location }).eq('id', itemId);
+  renderSharedBags();
+}
+
+function render() {
+  const list = document.getElementById('item-list');
+  if (!items.length) {
+    list.innerHTML = `<p class="label">No items yet — add one above, or add items while building your timetable.</p>`;
+    return;
+  }
+
+  const sortByMissed = (a, b) => (b.missed_count || 0) - (a.missed_count || 0);
+  const groups = bags.map(bag => ({ bag, items: items.filter(i => i.bag_id === bag.id).sort(sortByMissed) }));
+  const unassigned = items.filter(i => !i.bag_id || !bags.find(b => b.id === i.bag_id)).sort(sortByMissed);
+  if (unassigned.length) groups.push({ bag: null, items: unassigned });
+
+  list.innerHTML = groups.filter(g => g.items.length).map(g => `
+    <div class="bag-group">
+      <div class="bag-group-header">
+        <span class="dot" style="background:${g.bag ? g.bag.color : 'var(--slate)'};"></span>
+        <h3>${g.bag ? g.bag.name : 'Unassigned'}</h3>
+      </div>
+      ${g.items.map(itemRowHtml).join('')}
+    </div>
+  `).join('');
+}
+
+function itemRowHtml(item) {
+  const bagOptions = ['<option value="">No bag</option>']
+    .concat(bags.map(b => `<option value="${b.id}" ${item.bag_id === b.id ? 'selected' : ''}>${b.name}</option>`));
+  const badge = item.missed_count >= 3
+    ? `<span class="forgotten-badge">🔥 Often forgotten</span>`
+    : '';
+  return `
+    <div class="item-row">
+      <span class="item-name">${item.name}${badge}</span>
+      <div class="item-controls">
+        <select class="bag-select" onchange="changeBag(${item.id}, this.value)">${bagOptions.join('')}</select>
+        <div class="toggle">
+          <button class="${item.location === 'home' ? 'active home' : ''}" onclick="setLoc(${item.id}, 'home')">Home</button>
+          <button class="${item.location === 'away' ? 'active away' : ''}" onclick="setLoc(${item.id}, 'away')">Away</button>
+        </div>
+        <button class="delete-item-btn" onclick="deleteItem(${item.id}, '${item.name.replace(/'/g, "\\'")}')" aria-label="Delete ${item.name}">&times;</button>
+      </div>
+    </div>
+  `;
+}
+
+async function deleteItem(itemId, name) {
+  if (!confirm(`Delete "${name}"? This also removes it from any timetable slots.`)) return;
+
+  // Clean up any slots that reference this item
+  const { data: affectedSlots } = await sb.from('slots')
+    .select('id, required_item_ids')
+    .contains('required_item_ids', [itemId]);
+  if (affectedSlots && affectedSlots.length) {
+    await Promise.all(affectedSlots.map(slot =>
+      sb.from('slots').update({
+        required_item_ids: slot.required_item_ids.filter(id => id !== itemId)
+      }).eq('id', slot.id)
+    ));
+  }
+
+  const { error } = await sb.from('items').delete().eq('id', itemId);
+  if (error) { console.error(error); return; }
+  items = items.filter(i => i.id !== itemId);
+  render();
+}
+
+async function changeBag(itemId, bagIdValue) {
+  const bagId = bagIdValue ? parseInt(bagIdValue, 10) : null;
+  await setItemBag(itemId, bagId);
+  items.find(i => i.id === itemId).bag_id = bagId;
+  render();
+}
+
+async function setLoc(id, loc) {
+  await setItemLocation(id, loc);
+  items.find(i => i.id === id).location = loc;
+  render();
+}
+
+async function addItem() {
+  const input = document.getElementById('new-item-input');
+  const name = input.value.trim();
+  if (!name) return;
+  const { data, error } = await sb.from('items')
+    .insert({ user_id: session.user.id, name, location: 'home' })
+    .select().single();
+  if (error) { console.error(error); return; }
+  items.push(data);
+  input.value = '';
+  render();
+}
+
+init();
+</script>
+</body>
+</html>

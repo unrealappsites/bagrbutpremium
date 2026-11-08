@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Bagr — never repack from memory again</title>
+<link rel="apple-touch-icon" href="logo-180.png">
+<link rel="icon" href="logo-32.png">
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Bagr">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-640x1136.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1242x2208.png" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1125x2436.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-828x1792.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1242x2688.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1170x2532.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1284x2778.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1179x2556.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1290x2796.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1206x2622.png" media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1320x2868.png" media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<meta name="theme-color" content="#171B24">
+<link rel="stylesheet" href="shared.css?v=5">
+<style>
+  body { background: var(--paper); overflow-x: hidden; }
+  .glow { position: absolute; inset: 0 0 auto 0; height: 760px; pointer-events: none;
+    background: radial-gradient(60% 60% at 78% 8%, rgba(232,163,60,0.28), transparent 70%),
+                radial-gradient(40% 50% at 8% 30%, rgba(184,64,43,0.08), transparent 70%); }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 1.5rem; position: relative; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: calc(1.25rem + env(safe-area-inset-top)) 0; }
+  .brand { font-family: var(--display); font-weight: 600; font-size: 1.5rem; letter-spacing: -0.03em; text-decoration: none; }
+  .brand .dot { color: var(--amber); }
+  .topbar nav { display: flex; align-items: center; gap: 1.4rem; font-size: 0.9rem; font-weight: 500; }
+  .topbar nav a:not(.btn) { text-decoration: none; color: var(--slate); }
+  .topbar nav a:not(.btn):hover { color: var(--ink); }
+  .hero { padding: 4.5rem 0 5rem; }
+  .pill { display: inline-flex; align-items: center; gap: 0.5rem; font-family: var(--mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em;
+    padding: 0.4rem 0.85rem; border: 1px solid var(--line-strong); border-radius: 999px; background: rgba(255,253,249,0.7); margin-bottom: 1.75rem; }
+  .pill i { width: 6px; height: 6px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 10px var(--amber); }
+  h1.headline { font-size: clamp(2.9rem, 8vw, 5.6rem); line-height: 0.98; letter-spacing: -0.04em; margin-bottom: 1.5rem; max-width: 12ch; }
+  .headline .accent { color: var(--amber-deep); }
+  .sub { max-width: 46ch; font-size: 1.15rem; color: var(--slate); margin: 0 0 2.2rem; }
+  .cta-row { display: flex; gap: 0.8rem; flex-wrap: wrap; margin-bottom: 4rem; }
+  .btn.lg { padding: 0.95rem 1.7rem; font-size: 1rem; }
+
+  .stub { background: var(--ink); color: var(--paper); border-radius: 20px; display: flex; max-width: 620px; overflow: hidden; position: relative;
+    box-shadow: var(--shadow-lg); border: 1px solid var(--line-on-ink); }
+  .stub::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(232,163,60,0.7), transparent); }
+  .stub-main { padding: 1.75rem 2rem; flex: 1; }
+  .stub-stub { width: 120px; padding: 1.5rem 1rem; border-left: 1px dashed rgba(246,242,234,0.3); display: flex; align-items: center; justify-content: center; }
+  .stub .label { color: var(--amber); }
+  .stub-day { font-family: var(--display); font-size: 1.5rem; margin: 0.4rem 0 1rem; letter-spacing: -0.02em; }
+  .stub-items { font-family: var(--mono); font-size: 0.88rem; line-height: 2; list-style: none; padding: 0; margin: 0; color: rgba(246,242,234,0.9); }
+  .stub-items li::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--amber); margin-right: 0.8rem; vertical-align: middle; }
+  .stub-code { font-family: var(--mono); font-size: 0.68rem; color: var(--slate); writing-mode: vertical-rl; letter-spacing: 0.16em; }
+
+  .how { padding: 1rem 0 6rem; }
+  .how h2 { font-size: clamp(1.9rem, 4.4vw, 3rem); max-width: 18ch; letter-spacing: -0.035em; margin-bottom: 3rem; line-height: 1.05; }
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+  .step { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 1.75rem; box-shadow: var(--shadow-sm); transition: transform 0.25s ease, box-shadow 0.25s ease; }
+  .step:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+  .step .num { font-family: var(--mono); font-size: 0.75rem; color: var(--amber-deep); letter-spacing: 0.1em; margin-bottom: 2.5rem; }
+  .step h3 { font-size: 1.3rem; margin-bottom: 0.6rem; }
+  .step p { color: var(--slate); font-size: 0.95rem; margin: 0; }
+
+  .final { background: var(--ink); color: var(--paper); border-radius: 28px; padding: 4rem 2rem; text-align: center; margin-bottom: 4rem; position: relative; overflow: hidden; }
+  .final::before { content: ''; position: absolute; inset: auto 0 -60% 0; height: 100%; background: radial-gradient(50% 50% at 50% 50%, rgba(232,163,60,0.35), transparent 70%); }
+  .final > * { position: relative; }
+  .final h2 { font-size: clamp(2rem, 5vw, 3.2rem); letter-spacing: -0.035em; margin-bottom: 1.75rem; }
+  .final .btn.amber { box-shadow: 0 8px 30px rgba(232,163,60,0.35); }
+
+  footer { padding: 0 1.5rem 3rem; text-align: center; font-family: var(--mono); font-size: 0.75rem; color: var(--slate); }
+
+  @media (max-width: 760px) {
+    .steps { grid-template-columns: 1fr; }
+    .hero { padding-top: 2.5rem; }
+    .stub { flex-direction: column; }
+    .stub-stub { border-left: none; border-top: 1px dashed rgba(246,242,234,0.3); width: auto; padding: 0.9rem; }
+    .stub-code { writing-mode: horizontal-tb; }
+    .topbar nav a:not(.btn) { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="glow"></div>
+<div class="wrap">
+  <header class="topbar">
+    <a class="brand" href="index.html">bagr<span class="dot">.</span></a>
+    <nav><a href="#how">How it works</a><a href="login.html">Sign in</a><a class="btn amber sm" href="onboarding.html">Get started</a></nav>
+  </header>
+
+  <section class="hero">
+    <div class="pill"><i></i>packed / unpacked</div>
+    <h1 class="headline">Stop repacking from <span class="accent">memory.</span></h1>
+    <p class="sub">Bagr tracks what's actually at home versus what's still at school or work, and tells you exactly what to grab the night before you need it.</p>
+    <div class="cta-row">
+      <a class="btn amber lg" href="onboarding.html">Continue</a>
+      <a class="btn outline lg" href="login.html">Already have an account?</a>
+    </div>
+    <div class="stub">
+      <div class="stub-main">
+        <div class="label">tomorrow requires</div>
+        <div class="stub-day">Chemistry — Period 3</div>
+        <ul class="stub-items"><li>Calculator</li><li>Lab coat</li><li>Textbook (Ch. 4–6)</li></ul>
+      </div>
+      <div class="stub-stub"><div class="stub-code">BAGR · TUE</div></div>
+    </div>
+  </section>
+
+  <section class="how" id="how">
+    <h2>Your stuff, split between two places. Bagr closes the gap.</h2>
+    <div class="steps">
+      <div class="step"><div class="num">01</div><h3>Set your timetable</h3><p>Add the recurring classes, shifts, or sessions you go to, and what each one requires.</p></div>
+      <div class="step"><div class="num">02</div><h3>Mark items as you move them</h3><p>When something leaves your bag or comes home, flag it. Bagr keeps score.</p></div>
+      <div class="step"><div class="num">03</div><h3>Get tonight's pack list</h3><p>Bagr cross-checks tomorrow's timetable against what's home and pushes a reminder before you forget.</p></div>
+    </div>
+  </section>
+
+  <section class="final">
+    <h2>Pack once. Forget nothing.</h2>
+    <a class="btn amber lg" href="onboarding.html">Get started</a>
+  </section>
+</div>
+
+<footer>Bagr — built for the stuff that lives in two places at once.</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="shared.js?v=4"></script>
+<script>
+  (async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) window.location.href = 'today.html';
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Timetable — Bagr</title>
+<link rel="apple-touch-icon" href="logo-180.png">
+<link rel="icon" href="logo-32.png">
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Bagr">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-640x1136.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1242x2208.png" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1125x2436.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-828x1792.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1242x2688.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1170x2532.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1284x2778.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1179x2556.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1290x2796.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1206x2622.png" media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1320x2868.png" media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<meta name="theme-color" content="#171B24">
+<link rel="stylesheet" href="shared.css?v=5">
+<style>
+  .day-col h2 { font-family: var(--mono); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--slate); margin-bottom: 0.75rem; }
+  .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1rem; }
+  @media (max-width: 900px) { .week-grid { grid-template-columns: 1fr; } }
+  .slot { border: 2px solid var(--ink); border-radius: var(--radius); padding: 0.75rem; margin-bottom: 0.75rem; background: white; position: relative; }
+  .slot-label { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.5rem; padding-right: 3.2rem; }
+  .slot-actions { position: absolute; top: 0.5rem; right: 0.5rem; display: flex; align-items: center; gap: 0.35rem; }
+  .slot-edit, .slot-delete, .slot-move {
+    background: none; border: none; color: var(--slate);
+    line-height: 1; cursor: pointer; padding: 0.2rem;
+  }
+  .slot-edit { font-size: 0.9rem; }
+  .slot-delete { font-size: 1rem; position: static; }
+  .slot-edit:hover { color: var(--ink); }
+  .slot-delete:hover { color: var(--stamp); }
+  .slot-move { font-size: 0.75rem; }
+  .slot-move:hover:not(:disabled) { color: var(--ink); }
+  .slot-move:disabled { opacity: 0.25; cursor: default; }
+  .slot-items { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .item-chip {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    font-family: var(--mono); font-size: 0.72rem; color: var(--ink);
+    background: var(--paper-dim); border-radius: 999px; padding: 0.2rem 0.5rem 0.2rem 0.6rem;
+  }
+  .item-chip button {
+    background: none; border: none; color: var(--slate); cursor: pointer;
+    font-size: 0.85rem; line-height: 1; padding: 0;
+  }
+  .item-chip button:hover { color: var(--stamp); }
+  .no-items { font-family: var(--mono); font-size: 0.75rem; color: var(--slate); }
+  .add-slot-btn { width: 100%; border: 2px dashed var(--slate); background: transparent; border-radius: var(--radius); padding: 0.6rem; font-size: 0.8rem; color: var(--slate); }
+  .add-slot-btn:hover { border-color: var(--ink); color: var(--ink); }
+
+  .modal-backdrop { position: fixed; inset: 0; background: rgba(20,24,31,0.5); display: none; align-items: center; justify-content: center; padding: 1.5rem; z-index: 10; }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    background: var(--paper); border: 2px solid var(--ink); border-radius: var(--radius);
+    padding: 1.75rem; max-width: 480px; width: 100%;
+    max-height: 85vh; display: flex; flex-direction: column;
+  }
+  .modal h3 { margin-bottom: 0.25rem; }
+  .modal .modal-subcopy { font-size: 0.85rem; color: var(--slate); margin-bottom: 1.25rem; }
+  .modal label { display: block; font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; margin: 0.9rem 0 0.35rem; color: var(--slate); }
+  .modal input, .modal select { width: 100%; padding: 0.6rem; border: 2px solid var(--ink); border-radius: var(--radius); font-family: var(--body); background: white; }
+
+  #modal-rows { overflow-y: auto; margin: 0 -0.25rem; padding: 0 0.25rem; }
+  .slot-row {
+    position: relative; background: white; border: 2px solid var(--ink);
+    border-radius: var(--radius); padding: 1rem 1rem 0.85rem; margin-bottom: 0.9rem;
+  }
+  .slot-row:last-child { margin-bottom: 0; }
+  .slot-row-header {
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--slate);
+  }
+  .slot-row-remove {
+    background: none; border: none; color: var(--slate); font-size: 1.1rem;
+    cursor: pointer; line-height: 1; padding: 0.1rem 0.3rem;
+  }
+  .slot-row-remove:hover { color: var(--stamp); }
+  .slot-row-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 0 0.75rem; }
+  .slot-row .row-label-field, .slot-row .row-items-field { grid-column: 1 / -1; }
+
+  .add-row-btn {
+    width: 100%; margin-top: 0.9rem; padding: 0.7rem; border: 2px dashed var(--slate);
+    border-radius: var(--radius); background: none; color: var(--slate);
+    font-family: var(--body); font-weight: 600; cursor: pointer; font-size: 0.9rem;
+  }
+  .add-row-btn:hover { border-color: var(--ink); color: var(--ink); }
+
+  .week-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.75rem; }
+  .week-tab {
+    font-family: var(--mono); font-size: 0.8rem; text-transform: uppercase;
+    padding: 0.5rem 1rem; border: 2px solid var(--ink); border-radius: 999px;
+    background: transparent; color: var(--ink); cursor: pointer;
+  }
+  .week-tab.active { background: var(--amber); }
+  .modal-actions { display: flex; gap: 0.75rem; margin-top: 1.25rem; flex-shrink: 0; }
+
+  #nl-entry-card {
+    position: relative;
+    background: linear-gradient(180deg, rgba(232,163,60,0.08), rgba(232,163,60,0) 60%);
+    border-color: var(--ink);
+    overflow: hidden;
+  }
+  #nl-entry-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--amber), transparent 85%);
+  }
+  #nl-entry-card .nl-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.2rem; }
+  #nl-entry-card .nl-sparkle { flex-shrink: 0; color: var(--amber); }
+  #nl-entry-card h3 { font-size: 1rem; margin: 0; }
+  #nl-entry-card .nl-tag {
+    font-family: var(--mono); font-size: 0.65rem; text-transform: uppercase;
+    letter-spacing: 0.06em; background: var(--amber); color: var(--ink);
+    padding: 0.1rem 0.45rem; border-radius: 999px; margin-left: 0.15rem;
+  }
+  .ultimate-badge {
+    font-family: var(--mono); font-size: 0.65rem; text-transform: uppercase;
+    letter-spacing: 0.06em; background: var(--amber); color: var(--ink);
+    padding: 0.1rem 0.45rem; border-radius: 999px;
+  }
+  #nl-entry-card .nl-subcopy { font-size: 0.85rem; color: var(--slate); margin: 0.35rem 0 0.9rem; }
+  #nl-entry-card textarea {
+    width: 100%; min-height: 74px; padding: 0.75rem; border: 2px solid var(--ink);
+    border-radius: var(--radius); font-family: var(--body); font-size: 0.95rem;
+    resize: vertical; background: var(--paper); transition: border-color 0.15s ease;
+  }
+  #nl-entry-card textarea:focus { outline: none; border-color: var(--amber); }
+  #nl-entry-card .nl-examples { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.6rem; }
+  #nl-entry-card .nl-example-chip {
+    font-family: var(--mono); font-size: 0.72rem; color: var(--slate);
+    background: var(--paper-dim); border: 1px solid transparent; border-radius: 999px;
+    padding: 0.3rem 0.65rem; cursor: pointer; transition: border-color 0.15s ease, color 0.15s ease;
+  }
+  #nl-entry-card .nl-example-chip:hover { border-color: var(--amber); color: var(--ink); }
+  #nl-entry-card .nl-actions { display: flex; align-items: center; gap: 0.75rem; margin-top: 1rem; }
+  #nl-entry-card .nl-parse-btn { display: inline-flex; align-items: center; gap: 0.45rem; }
+  #nl-entry-card .nl-parse-btn .nl-sparkle { color: var(--ink); }
+  #nl-entry-card .nl-parse-btn:disabled { opacity: 0.7; cursor: default; }
+  #nl-entry-card .nl-spin { animation: nl-spin 0.8s linear infinite; }
+  @keyframes nl-spin { to { transform: rotate(360deg); } }
+
+  /* "Thinking" glow, Bagr-coloured — box-shadow isn't clipped by the card's
+     own overflow:hidden, so this bleeds outside the card cleanly. */
+  #nl-entry-card.parsing {
+    animation: bagr-ai-glow 2.4s ease-in-out infinite;
+    border-color: transparent;
+  }
+  #nl-entry-card.parsing::before {
+    height: 100%;
+    background: linear-gradient(120deg, var(--amber), #F4CE8C, var(--ink), var(--amber));
+    background-size: 300% 300%;
+    opacity: 0.16;
+    animation: bagr-ai-sheen 2.4s ease-in-out infinite;
+  }
+  @keyframes bagr-ai-glow {
+    0%, 100% { box-shadow: 0 0 0 2px rgba(232,163,60,0.5), 0 0 22px 2px rgba(232,163,60,0.35); }
+    35%      { box-shadow: 0 0 0 2px rgba(232,163,60,0.7), 0 0 40px 10px rgba(232,163,60,0.5); }
+    65%      { box-shadow: 0 0 0 2px rgba(23,27,36,0.4), 0 0 40px 10px rgba(23,27,36,0.3); }
+  }
+  @keyframes bagr-ai-sheen {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #nl-entry-card.parsing { animation: none; box-shadow: 0 0 24px 4px rgba(232,163,60,0.4); }
+    #nl-entry-card.parsing::before { animation: none; }
+  }
+  #nl-entry-card .nl-status {
+    font-size: 0.85rem; color: var(--slate); display: flex; align-items: center; gap: 0.4rem;
+  }
+  #nl-entry-card .nl-status.error { color: var(--stamp); }
+  #nl-entry-card .nl-locked { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; }
+  #nl-entry-card .nl-locked a { color: var(--ink); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <nav class="app-nav"></nav>
+
+  <main class="app-main">
+    <h1 style="font-size:1.8rem; margin-bottom:0.4rem;">Your timetable</h1>
+    <p class="label" style="margin-bottom:1.25rem;">what recurs, and what it requires</p>
+
+    <div id="nl-entry-card" class="card" style="max-width:640px; margin-bottom:1.5rem;"><!-- populated by JS --></div>
+
+    <div class="week-tabs" id="week-tabs" style="display:none;"></div>
+
+    <div class="week-grid" id="week-grid"><!-- populated by JS --></div>
+  </main>
+</div>
+
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <h3 id="modal-title">Add to timetable</h3>
+    <p class="modal-subcopy" id="modal-subcopy"></p>
+    <div id="modal-rows"><!-- populated by JS --></div>
+    <button type="button" id="add-row-btn" class="add-row-btn" onclick="addModalRow()">+ Add another slot</button>
+    <div class="modal-actions">
+      <button class="btn outline" onclick="closeModal()">Cancel</button>
+      <button class="btn amber" id="modal-save-btn" onclick="saveAllSlots()">Add slot</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="shared.js?v=4"></script>
+<script>
+let session, allSlots = [], allItems = [], profile = null, activeDay = 0, activeWeekTab = 'A', editingSlotId = null, isUltimate = false;
+
+async function init() {
+  session = await requireSession();
+  if (!session) return;
+  renderDrawerNav('timetable');
+  const userId = session.user.id;
+  const [slotsData, itemsData, profileData, subData] = await Promise.all([
+    fetchSlots(userId), fetchItems(userId), fetchProfile(userId),
+    sb.from('subscriptions').select('tier').eq('user_id', userId).maybeSingle()
+  ]);
+  allSlots = slotsData; allItems = itemsData; profile = profileData;
+  isUltimate = subData.data?.tier === 'ultimate';
+
+  renderWeekTabs();
+  renderNlEntryCard();
+  render();
+}
+
+function renderWeekTabs() {
+  if (profile && profile.has_ab_weeks) {
+    document.getElementById('week-tabs').style.display = 'flex';
+    document.getElementById('week-tabs').innerHTML = `
+      <button class="week-tab active" onclick="setWeekTab('A', this)">Week A</button>
+      <button class="week-tab" onclick="setWeekTab('B', this)">Week B</button>
+    `;
+  } else {
+    document.getElementById('week-tabs').style.display = 'none';
+  }
+}
+
+function setWeekTab(letter, btn) {
+  activeWeekTab = letter;
+  document.querySelectorAll('.week-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function render() {
+  const grid = document.getElementById('week-grid');
+  grid.innerHTML = DAYS.map((day, idx) => {
+    const daySlots = allSlots
+      .filter(s => s.day_of_week === idx && (!profile?.has_ab_weeks || s.week === activeWeekTab || s.week === null))
+      .sort((a, b) => a.sort_order - b.sort_order);
+    return `
+    <div class="day-col">
+      <h2>${day}</h2>
+      ${daySlots.map((s, i) => slotHtml(s, i === 0, i === daySlots.length - 1)).join('')}
+      <button class="add-slot-btn" onclick="openModal(${idx})">+ Add slot</button>
+    </div>
+  `;
+  }).join('');
+}
+
+function slotHtml(slot, isFirst, isLast) {
+  const chips = (slot.required_item_ids || [])
+    .map(id => allItems.find(i => i.id === id))
+    .filter(Boolean)
+    .map(item => `
+      <span class="item-chip">
+        ${item.name}
+        <button onclick="removeItemFromSlot(${slot.id}, ${item.id})" aria-label="Remove ${item.name}">&times;</button>
+      </span>`)
+    .join('');
+  return `
+    <div class="slot">
+      <div class="slot-actions">
+        <button class="slot-move" onclick="moveSlot(${slot.id}, -1)" aria-label="Move slot up" ${isFirst ? 'disabled' : ''}>&#9650;</button>
+        <button class="slot-move" onclick="moveSlot(${slot.id}, 1)" aria-label="Move slot down" ${isLast ? 'disabled' : ''}>&#9660;</button>
+        <button class="slot-edit" onclick="editSlot(${slot.id})" aria-label="Edit slot">✎</button>
+        <button class="slot-delete" onclick="deleteSlot(${slot.id})" aria-label="Delete slot">&times;</button>
+      </div>
+      <div class="slot-label">${slot.label}</div>
+      <div class="slot-items">${chips || '<span class="no-items">No items set</span>'}</div>
+    </div>`;
+}
+
+// Swaps this slot's position with its neighbour in the same day (and same
+// week, if A/B weeks are on) by swapping their sort_order values.
+async function moveSlot(slotId, direction) {
+  const slot = allSlots.find(s => s.id === slotId);
+  if (!slot) return;
+
+  const daySlots = allSlots
+    .filter(s => s.day_of_week === slot.day_of_week && (!profile?.has_ab_weeks || s.week === slot.week))
+    .sort((a, b) => a.sort_order - b.sort_order);
+
+  const idx = daySlots.findIndex(s => s.id === slotId);
+  const swapIdx = idx + direction;
+  if (swapIdx < 0 || swapIdx >= daySlots.length) return;
+
+  const other = daySlots[swapIdx];
+  const [aOrder, bOrder] = [slot.sort_order, other.sort_order];
+
+  const [{ error: e1 }, { error: e2 }] = await Promise.all([
+    sb.from('slots').update({ sort_order: bOrder }).eq('id', slot.id),
+    sb.from('slots').update({ sort_order: aOrder }).eq('id', other.id),
+  ]);
+  if (e1 || e2) { console.error(e1 || e2); return; }
+
+  slot.sort_order = bOrder;
+  other.sort_order = aOrder;
+  render();
+}
+
+async function deleteSlot(slotId) {
+  if (!confirm('Delete this slot?')) return;
+  const { error } = await sb.from('slots').delete().eq('id', slotId);
+  if (error) { console.error(error); return; }
+  allSlots = allSlots.filter(s => s.id !== slotId);
+  render();
+}
+
+async function removeItemFromSlot(slotId, itemId) {
+  const slot = allSlots.find(s => s.id === slotId);
+  if (!slot) return;
+  const newIds = (slot.required_item_ids || []).filter(id => id !== itemId);
+  const { error } = await sb.from('slots').update({ required_item_ids: newIds }).eq('id', slotId);
+  if (error) { console.error(error); return; }
+  slot.required_item_ids = newIds;
+  render();
+}
+
+let rowCounter = 0;
+
+function dayOptionsHtml(selectedIdx) {
+  return DAYS.map((d, i) => `<option value="${i}" ${i === selectedIdx ? 'selected' : ''}>${d}</option>`).join('');
+}
+
+function weekOptionsHtml(selectedWeek) {
+  return `
+    <option value="A" ${selectedWeek !== 'B' ? 'selected' : ''}>Week A only</option>
+    <option value="B" ${selectedWeek === 'B' ? 'selected' : ''}>Week B only</option>`;
+}
+
+// Builds one editable row. `prefill` lets both the manual "+Add slot" button
+// and the AI parser populate the same row shape — the only difference is
+// what's already filled in when it appears.
+function addModalRow(prefill = {}) {
+  const id = `row-${++rowCounter}`;
+  const dayIdx = prefill.day_of_week ?? activeDay;
+  // Priority: an explicit saved week (editing a real slot) wins outright;
+  // then the AI parser's alternating flag (it only knows true/false, not a
+  // specific letter, so 'A' is a placeholder the user can correct); then
+  // whichever week tab you're currently looking at, since that's the most
+  // likely week for a new slot you're adding right now.
+  const week = (prefill.week === 'A' || prefill.week === 'B')
+    ? prefill.week
+    : prefill.alternating ? 'A' : (activeWeekTab || 'A');
+
+  const row = document.createElement('div');
+  row.className = 'slot-row';
+  row.id = id;
+  row.innerHTML = `
+    <div class="slot-row-header">
+      <span>Slot</span>
+      <button type="button" class="slot-row-remove" onclick="removeModalRow('${id}')" aria-label="Remove this slot">&times;</button>
+    </div>
+    <div class="slot-row-fields">
+      <div>
+        <label>Day</label>
+        <select class="row-day">${dayOptionsHtml(dayIdx)}</select>
+      </div>
+      ${profile?.has_ab_weeks ? `
+      <div>
+        <label>Repeats</label>
+        <select class="row-week">${weekOptionsHtml(week)}</select>
+      </div>` : ''}
+    </div>
+    <div class="row-label-field">
+      <label>Label</label>
+      <input class="row-label" placeholder="e.g. Chemistry — Period 3" value="${(prefill.label || '').replace(/"/g, '&quot;')}">
+    </div>
+    <div class="row-items-field">
+      <label>Required items (comma separated)</label>
+      <input class="row-items" placeholder="Calculator, Lab coat, Textbook" value="${(prefill.items || []).join(', ').replace(/"/g, '&quot;')}">
+    </div>
+    ${isUltimate ? `
+    <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.85rem; color:var(--slate); margin-top:0.6rem; cursor:pointer;">
+      <input type="checkbox" class="row-autolink">
+      Match items across every other slot with this same subject name
+      <span class="ultimate-badge">Ultimate</span>
+    </label>` : ''}`;
+  document.getElementById('modal-rows').appendChild(row);
+  updateRemoveButtonsState();
+}
+
+function removeModalRow(rowId) {
+  const row = document.getElementById(rowId);
+  if (row) row.remove();
+  updateRemoveButtonsState();
+}
+
+// Keep at least one row — no point letting someone empty the modal entirely.
+function updateRemoveButtonsState() {
+  const rows = document.querySelectorAll('.slot-row');
+  document.querySelectorAll('.slot-row-remove').forEach(btn => {
+    btn.style.visibility = rows.length > 1 ? 'visible' : 'hidden';
+  });
+}
+
+function openModal(dayIdx) {
+  editingSlotId = null;
+  activeDay = dayIdx;
+  document.getElementById('modal-title').textContent = 'Add to timetable';
+  document.getElementById('modal-subcopy').textContent = '';
+  document.getElementById('modal-save-btn').textContent = 'Add slot';
+  document.getElementById('add-row-btn').style.display = '';
+  document.getElementById('modal-rows').innerHTML = '';
+  addModalRow({ day_of_week: dayIdx });
+  document.getElementById('modal').classList.add('open');
+}
+
+// Used by the AI parser to open the modal pre-populated with several rows
+// at once, one per detected entry, for review before anything saves.
+function openModalWithEntries(entries) {
+  editingSlotId = null;
+  document.getElementById('modal-title').textContent = `Review ${entries.length} slot${entries.length > 1 ? 's' : ''}`;
+  document.getElementById('modal-subcopy').textContent = 'Edit anything that\'s off before adding — nothing is saved yet.';
+  document.getElementById('modal-save-btn').textContent = `Add ${entries.length} slot${entries.length > 1 ? 's' : ''}`;
+  document.getElementById('add-row-btn').style.display = '';
+  document.getElementById('modal-rows').innerHTML = '';
+  entries.forEach(e => addModalRow(e));
+  document.getElementById('modal').classList.add('open');
+}
+
+// Editing is always exactly one existing slot — no "add another row" here,
+// since that would blur "editing X" into "also creating something new".
+function editSlot(slotId) {
+  const slot = allSlots.find(s => s.id === slotId);
+  if (!slot) return;
+  editingSlotId = slotId;
+
+  const itemNames = (slot.required_item_ids || [])
+    .map(id => allItems.find(i => i.id === id))
+    .filter(Boolean)
+    .map(i => i.name);
+
+  document.getElementById('modal-title').textContent = 'Edit slot';
+  document.getElementById('modal-subcopy').textContent = '';
+  document.getElementById('modal-save-btn').textContent = 'Save changes';
+  document.getElementById('add-row-btn').style.display = 'none';
+  document.getElementById('modal-rows').innerHTML = '';
+  addModalRow({
+    day_of_week: slot.day_of_week,
+    week: slot.week,
+    label: slot.label,
+    items: itemNames,
+  });
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  document.getElementById('modal-rows').innerHTML = '';
+  document.getElementById('add-row-btn').style.display = '';
+  editingSlotId = null;
+}
+
+async function saveAllSlots() {
+  const rows = [...document.querySelectorAll('.slot-row')];
+  const btn = document.getElementById('modal-save-btn');
+  const toSave = rows.map(row => ({
+    day_of_week: +row.querySelector('.row-day').value,
+    week: row.querySelector('.row-week') ? (row.querySelector('.row-week').value || null) : null,
+    label: row.querySelector('.row-label').value.trim(),
+    itemNames: row.querySelector('.row-items').value.split(',').map(s => s.trim()).filter(Boolean),
+    autoLink: isUltimate && !!row.querySelector('.row-autolink')?.checked,
+  })).filter(r => r.label);
+
+  if (!toSave.length) return;
+
+  btn.disabled = true;
+  btn.textContent = editingSlotId ? 'Saving…' : 'Adding…';
+
+  for (const entry of toSave) {
+    // Upsert any new item names, collect ids
+    const itemIds = [];
+    for (const name of entry.itemNames) {
+      let existing = allItems.find(i => i.name.toLowerCase() === name.toLowerCase());
+      if (!existing) {
+        const { data, error } = await sb.from('items')
+          .insert({ user_id: session.user.id, name, location: 'home' })
+          .select().single();
+        if (error) { console.error(error); continue; }
+        existing = data;
+        allItems.push(existing);
+      }
+      itemIds.push(existing.id);
+    }
+
+    if (editingSlotId) {
+      const { data, error } = await sb.from('slots')
+        .update({
+          day_of_week: entry.day_of_week,
+          week: profile?.has_ab_weeks ? entry.week : null,
+          label: entry.label,
+          required_item_ids: itemIds
+        })
+        .eq('id', editingSlotId)
+        .select().single();
+      if (error) { console.error(error); continue; }
+      const idx = allSlots.findIndex(s => s.id === editingSlotId);
+      if (idx !== -1) allSlots[idx] = data;
+    } else {
+      const siblingOrders = allSlots
+        .filter(s => s.day_of_week === entry.day_of_week && (!profile?.has_ab_weeks || s.week === entry.week))
+        .map(s => s.sort_order);
+      const nextOrder = siblingOrders.length ? Math.max(...siblingOrders) + 1 : 0;
+
+      const { data, error } = await sb.from('slots')
+        .insert({
+          user_id: session.user.id,
+          day_of_week: entry.day_of_week,
+          week: profile?.has_ab_weeks ? entry.week : null,
+          label: entry.label,
+          required_item_ids: itemIds,
+          sort_order: nextOrder
+        })
+        .select().single();
+      if (error) { console.error(error); continue; }
+      allSlots.push(data);
+    }
+
+    // Bagr Ultimate — same-subject auto-link: push this slot's item list onto
+    // every other slot with the identical label (e.g. every "French" slot),
+    // so setting items once covers every occurrence across the week/rotation.
+    if (entry.autoLink) {
+      const matches = allSlots.filter(s =>
+        s.id !== editingSlotId &&
+        s.label.trim().toLowerCase() === entry.label.toLowerCase()
+      );
+      for (const match of matches) {
+        const { data: updated, error: linkError } = await sb.from('slots')
+          .update({ required_item_ids: itemIds })
+          .eq('id', match.id)
+          .select().single();
+        if (linkError) { console.error(linkError); continue; }
+        const idx = allSlots.findIndex(s => s.id === match.id);
+        if (idx !== -1) allSlots[idx] = updated;
+      }
+    }
+  }
+
+  btn.disabled = false;
+  closeModal();
+  render();
+}
+
+// Bagr Ultimate — natural-language timetable setup. This function only
+// PROPOSES a slot (via parse-timetable-entry, a free Hugging Face call) —
+// it never writes anything itself. It prefills the existing "New slot"
+// modal with what got parsed, so the person still reviews and confirms
+// (or edits) before saveAllSlots() actually writes to the database, exactly
+// the same path as adding a slot manually.
+async function renderNlEntryCard() {
+  const card = document.getElementById('nl-entry-card');
+
+  const sparkleSvg = `<svg class="nl-sparkle" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c.6 3.4 2.4 5.4 6 6-3.6.6-5.4 2.6-6 6-.6-3.4-2.4-5.4-6-6 3.6-.6 5.4-2.6 6-6z"/></svg>`;
+
+  if (!isUltimate) {
+    card.innerHTML = `
+      <div class="nl-locked">
+        ${sparkleSvg}
+        <span>Describe your week in plain English and let Bagr build the slot for you — that's a <a href="upgrade.html">Bagr Ultimate</a> feature.</span>
+      </div>`;
+    return;
+  }
+
+  card.innerHTML = `
+    <div class="nl-header">
+      ${sparkleSvg}
+      <h3>Describe a slot</h3>
+      <span class="nl-tag">Ultimate</span>
+    </div>
+    <p class="nl-subcopy">Type it like you'd tell a friend — Bagr figures out the day, whether it alternates, and what you need.</p>
+    <textarea id="nl-text-input" placeholder="e.g. every other Tuesday I have football, need shin pads and a water bottle"></textarea>
+    <div class="nl-examples">
+      <button type="button" class="nl-example-chip" onclick="useNlExample(this)">gym Mondays and Thursdays, trainers and a towel</button>
+      <button type="button" class="nl-example-chip" onclick="useNlExample(this)">swimming every Friday, need goggles</button>
+      <button type="button" class="nl-example-chip" onclick="useNlExample(this)">every other Wednesday, orchestra — bring my violin</button>
+    </div>
+    <div class="nl-actions">
+      <button class="btn amber nl-parse-btn" id="nl-parse-btn" onclick="parseTimetableEntry()">
+        ${sparkleSvg}<span id="nl-parse-btn-label">Parse with AI</span>
+      </button>
+      <span class="nl-status" id="nl-status"></span>
+    </div>`;
+}
+
+function useNlExample(btn) {
+  document.getElementById('nl-text-input').value = btn.textContent;
+  document.getElementById('nl-text-input').focus();
+}
+
+async function parseTimetableEntry() {
+  const card = document.getElementById('nl-entry-card');
+  const input = document.getElementById('nl-text-input');
+  const status = document.getElementById('nl-status');
+  const btn = document.getElementById('nl-parse-btn');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const idleBtnHtml = btn.innerHTML;
+  btn.disabled = true;
+  const spinSvg = `<svg class="nl-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/></svg>`;
+  btn.innerHTML = `${spinSvg}<span>Reading that…</span>`;
+  status.className = 'nl-status';
+  status.textContent = '';
+  card.classList.add('parsing');
+
+  const resetButton = () => { btn.disabled = false; btn.innerHTML = idleBtnHtml; card.classList.remove('parsing'); };
+
+  try {
+    const { data, error } = await sb.functions.invoke('parse-timetable-entry', { body: { text } });
+
+    if (error) {
+      // supabase-js treats any non-2xx response as an error and drops the
+      // JSON body into `error.context` instead of `data` — read it back out
+      // so real server-side errors (bad/missing key, HF timeout, etc.) show
+      // their actual message instead of a generic "couldn't reach" fallback.
+      let msg = "Couldn't reach the parser — try again, or add it manually below.";
+      try {
+        const body = await error.context.json();
+        if (body?.error) msg = body.error;
+      } catch {
+        // context wasn't JSON — stick with the generic message
+      }
+      status.className = 'nl-status error';
+      status.textContent = msg;
+      resetButton();
+      return;
+    }
+
+    if (!data.entitled) {
+      status.className = 'nl-status error';
+      status.textContent = "That's a Bagr Ultimate feature — head to the Upgrade tab.";
+      resetButton();
+      return;
+    }
+    if (data.error) {
+      status.className = 'nl-status error';
+      status.textContent = data.error;
+      resetButton();
+      return;
+    }
+    card.classList.remove('parsing');
+
+    const entries = data.entries || [];
+    if (!entries.length) {
+      status.className = 'nl-status error';
+      status.textContent = "Couldn't find anything to add in that — try rephrasing.";
+      resetButton();
+      return;
+    }
+
+    // Enable A/B weeks on the fly if any parsed entry needs it and it isn't
+    // already on, so the parsed result actually has somewhere to go.
+    const needsAbWeeks = entries.some(e => e.alternating);
+    if (needsAbWeeks && !profile?.has_ab_weeks) {
+      const { data: updated, error: profErr } = await sb.from('profiles')
+        .update({ has_ab_weeks: true, ab_reference_date: new Date().toISOString().slice(0, 10), ab_reference_week: 'A' })
+        .eq('user_id', session.user.id)
+        .select().single();
+      if (!profErr) {
+        profile = updated;
+        renderWeekTabs();
+      }
+    }
+
+    openModalWithEntries(entries);
+
+    // Clean slate for next time — safe to fully rebuild since the modal now
+    // holds everything the person needs to see.
+    renderNlEntryCard();
+  } catch (err) {
+    status.className = 'nl-status error';
+    status.textContent = "Couldn't reach the parser — try again, or add it manually below.";
+    resetButton();
+  }
+}
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,133 @@
+/* ===== Bagr — design tokens (premium pass) ===== */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  --ink: #14171F;
+  --ink-soft: #1E232E;
+  --paper: #F6F2EA;
+  --paper-dim: #E9E4D8;
+  --surface: #FFFDF9;
+  --amber: #E8A33C;
+  --amber-deep: #C98421;
+  --stamp: #B8402B;
+  --slate: #747A86;
+  --line: rgba(20,23,31,0.10);
+  --line-strong: rgba(20,23,31,0.18);
+  --line-on-ink: rgba(246,242,234,0.12);
+  --shadow-sm: 0 1px 2px rgba(20,23,31,0.05), 0 2px 8px rgba(20,23,31,0.04);
+  --shadow-md: 0 2px 4px rgba(20,23,31,0.04), 0 12px 32px rgba(20,23,31,0.08);
+  --shadow-lg: 0 4px 8px rgba(20,23,31,0.05), 0 30px 70px rgba(20,23,31,0.16);
+
+  --display: 'Fraunces', Georgia, serif;
+  --mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --body: 'Inter', system-ui, sans-serif;
+  --radius: 14px;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: var(--body); line-height: 1.5;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+h1, h2, h3 { font-family: var(--display); font-weight: 600; letter-spacing: -0.025em; margin: 0; }
+.eyebrow, .manifest, .tag-mono { font-family: var(--mono); }
+a { color: inherit; }
+button { font-family: var(--body); cursor: pointer; }
+::selection { background: var(--amber); color: var(--ink); }
+
+.perf { border: none; border-top: 1px dashed var(--slate); opacity: 0.4; margin: 0; }
+.perf-ink { border-top-color: var(--paper-dim); opacity: 0.35; }
+.stripe { height: 3px; background: linear-gradient(90deg, var(--amber), transparent 70%); }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.8rem 1.4rem; border-radius: 999px;
+  border: 1px solid var(--ink); background: var(--ink); color: var(--paper);
+  font-weight: 500; font-size: 0.93rem; letter-spacing: -0.005em; text-decoration: none;
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,0.12);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+.btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.12); }
+.btn:active { transform: translateY(0); }
+.btn.outline { background: transparent; color: var(--ink); border-color: var(--line-strong); box-shadow: none; }
+.btn.outline:hover { background: var(--surface); border-color: var(--ink); }
+.btn.amber { background: linear-gradient(180deg, #F0B04C, var(--amber)); border-color: var(--amber-deep); color: var(--ink); font-weight: 600; }
+.btn.sm { padding: 0.55rem 1.1rem; font-size: 0.85rem; }
+
+:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* App shell */
+.app-shell { min-height: 100vh; display: flex; flex-direction: column; }
+.app-nav {
+  display: grid; grid-template-columns: 44px 1fr 44px; align-items: center;
+  padding: calc(0.9rem + env(safe-area-inset-top)) 1.25rem 0.9rem;
+  border-bottom: 1px solid var(--line);
+  background: rgba(246,242,234,0.82);
+  -webkit-backdrop-filter: saturate(1.4) blur(14px); backdrop-filter: saturate(1.4) blur(14px);
+  position: sticky; top: 0; z-index: 5;
+}
+.app-nav .logo-mark { font-family: var(--display); font-weight: 600; font-size: 1.35rem; letter-spacing: -0.03em; text-align: center; text-decoration: none; color: var(--ink); }
+.app-nav .logo-mark .dot { color: var(--amber); }
+.hamburger { background: none; border: none; padding: 0.5rem; display: flex; flex-direction: column; gap: 5px; }
+.hamburger span { width: 18px; height: 1.5px; background: var(--ink); display: block; border-radius: 2px; }
+
+.drawer-overlay { position: fixed; inset: 0; background: rgba(20,23,31,0.4); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); opacity: 0; pointer-events: none; transition: opacity 0.25s ease; z-index: 20; }
+.drawer-overlay.open { opacity: 1; pointer-events: auto; }
+.drawer {
+  position: fixed; top: 0; left: 0; bottom: 0; width: 290px; height: 100dvh;
+  background: var(--ink); color: var(--paper); box-shadow: var(--shadow-lg);
+  transform: translateX(-100%); transition: transform 0.3s cubic-bezier(.2,.8,.2,1); z-index: 21;
+  padding: calc(1.5rem + env(safe-area-inset-top)) 1.1rem calc(1.5rem + env(safe-area-inset-bottom));
+  overflow-y: auto;
+}
+.drawer.open { transform: translateX(0); }
+.drawer-close { background: none; border: none; color: var(--paper); font-size: 1.5rem; position: absolute; top: calc(1.2rem + env(safe-area-inset-top)); right: 1.25rem; line-height: 1; opacity: 0.7; }
+.drawer-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 14px var(--amber); margin: 0 0 2.5rem 0.4rem; }
+.drawer-label { font-family: var(--mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--slate); margin: 0 0 0.9rem 0.4rem; }
+.drawer-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.8rem 0.9rem; border-radius: 12px; color: rgba(246,242,234,0.85); text-decoration: none; font-weight: 500; font-size: 0.93rem; margin-bottom: 0.2rem; transition: background 0.15s ease; }
+.drawer-link svg { flex-shrink: 0; opacity: 0.8; }
+.drawer-link.active { background: var(--amber); color: var(--ink); }
+.drawer-link:not(.active):hover { background: var(--ink-soft); }
+
+.app-main { flex: 1; padding: 2.5rem 1.5rem 5rem; max-width: 880px; margin: 0 auto; width: 100%; }
+.app-main h1 { letter-spacing: -0.03em; }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.4rem; box-shadow: var(--shadow-sm); }
+.empty-state { border: 1px dashed var(--line-strong); border-radius: var(--radius); padding: 2.75rem 1.75rem; text-align: center; background: rgba(255,253,249,0.5); }
+.empty-state .icon { font-size: 2rem; margin-bottom: 1rem; }
+.empty-state h3 { font-size: 1.4rem; margin-bottom: 0.5rem; }
+.empty-state p { color: var(--slate); margin-bottom: 1.5rem; }
+.label { font-family: var(--mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--slate); }
+
+/* Premium overrides for page-level styles: thinner borders, softer depth.
+   !important here is deliberate — it beats the per-page <style> blocks. */
+.slot, .item-row, .modal, .onboard-modal, .login-card, .bag-chip, .chip, .toggle, .bag-select,
+.week-tab, .slot-row, .plan-card, .status-banner, .week-choice button, .add-slot-btn {
+  border-width: 1px !important; border-color: var(--line-strong) !important;
+}
+.slot, .item-row, .slot-row, .bag-chip, .chip { box-shadow: var(--shadow-sm); background: var(--surface) !important; }
+.modal, .onboard-modal, .login-card { box-shadow: var(--shadow-lg); border-radius: 20px !important; }
+.modal input, .modal select, .pw-form input, .magic-form input, .add-row input, .app-main select, .app-main textarea, .onboard-modal select {
+  border-width: 1px !important; border-color: var(--line-strong) !important; background: var(--surface) !important;
+}
+.modal input:focus, .pw-form input:focus, .magic-form input:focus, .add-row input:focus, .app-main textarea:focus {
+  outline: none; border-color: var(--amber-deep) !important; box-shadow: 0 0 0 4px rgba(232,163,60,0.18);
+}
+.week-tab.active, .toggle button.active.home, .week-choice button.selected { background: var(--amber) !important; }
+.plan-card.ultimate { border-color: var(--ink) !important; background: var(--ink) !important; }
+.plan-card.plus { border-color: var(--amber) !important; }
+.stub { border-radius: 18px !important; box-shadow: var(--shadow-lg) !important; }
+.stub-day { letter-spacing: -0.02em; }
+.item-chip, .nl-example-chip { border: 1px solid var(--line) !important; }
+
+/* In-app launch splash */
+#launch-splash { position: fixed; inset: 0; z-index: 999; background: var(--paper); display: flex; align-items: center; justify-content: center; transition: opacity 0.35s ease; }
+#launch-splash.hide { opacity: 0; pointer-events: none; }
+#launch-splash .ls-wordmark { font-family: var(--display); font-weight: 600; font-size: 11vw; color: var(--ink); letter-spacing: -0.03em; line-height: 1; display: flex; align-items: flex-end; }
+#launch-splash .ls-wordmark .dot { color: var(--amber); }
+#launch-splash .ls-sticker { position: absolute; filter: drop-shadow(0 1.2vw 1.6vw rgba(20,23,31,0.18)); }
+#launch-splash .ls-sticker svg { width: 100%; height: 100%; display: block; }

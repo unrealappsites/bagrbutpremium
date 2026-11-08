@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Today — Bagr</title>
+<link rel="apple-touch-icon" href="logo-180.png">
+<link rel="icon" href="logo-32.png">
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Bagr">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-640x1136.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1242x2208.png" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1125x2436.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-828x1792.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1242x2688.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1170x2532.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1284x2778.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1179x2556.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1290x2796.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1206x2622.png" media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash/apple-splash-1320x2868.png" media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<meta name="theme-color" content="#171B24">
+<link rel="stylesheet" href="shared.css?v=5">
+<style>
+  .stub {
+    background: var(--ink); color: var(--paper); border-radius: var(--radius);
+    display: flex; max-width: 640px; overflow: hidden;
+    box-shadow: 0 18px 40px rgba(23,27,36,0.2); margin-bottom: 1.5rem;
+  }
+  .stub-main { padding: 1.5rem 1.75rem; flex: 1; }
+  .stub-stub { width: 130px; padding: 1.5rem 1rem; border-left: 2px dashed var(--paper); display: flex; align-items: center; justify-content: center; }
+  .stub .label { color: var(--amber); }
+  .stub-day { font-family: var(--display); font-weight: 700; font-size: 1.4rem; margin: 0.3rem 0 0.9rem; }
+  .pack-item {
+    display: flex; align-items: center; gap: 0.6rem; font-family: var(--mono); font-size: 0.9rem; padding: 0.3rem 0;
+    background: none; border: none; text-align: left; width: 100%; color: inherit;
+  }
+  button.pack-item { cursor: pointer; }
+  button.pack-item:active { opacity: 0.6; }
+  .pack-item.have { text-decoration: line-through; opacity: 0.5; }
+  .dot-missing { width: 8px; height: 8px; border-radius: 50%; background: var(--stamp); flex-shrink: 0; }
+  .dot-have { width: 8px; height: 8px; border-radius: 50%; background: #4d7c4a; flex-shrink: 0; }
+  .skip-day-btn {
+    background: none; border: none; color: var(--amber); font-family: var(--mono);
+    font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em;
+    padding: 0; margin-top: 1rem; cursor: pointer;
+  }
+  .skip-day-btn:hover { text-decoration: underline; }
+
+  .brief-card { max-width: 640px; margin-bottom: 1.5rem; }
+  .brief-card h3 { font-size: 1.05rem; margin-bottom: 0.9rem; }
+  .brief-empty { color: var(--slate); font-size: 0.9rem; }
+  .brief-row { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--line); }
+  .brief-row:last-child { border-bottom: none; }
+  .brief-row .pack-item { padding: 0; }
+  .brief-status { font-family: var(--mono); font-size: 0.75rem; text-transform: uppercase; }
+  .brief-status.ok { color: #4d7c4a; }
+  .brief-status.warn { color: var(--stamp); }
+  .forgotten-line {
+    display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem; padding-top: 1rem;
+    border-top: 2px dashed var(--slate); font-size: 0.85rem; color: var(--slate);
+  }
+
+  .skipped-list { max-width: 640px; margin-bottom: 1.5rem; }
+  .skipped-list h4 { font-size: 0.9rem; margin-bottom: 0.75rem; }
+  .skipped-row {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 0.85rem; padding: 0.5rem 0; border-bottom: 1px solid var(--line);
+  }
+  .skipped-row:last-child { border-bottom: none; }
+  .skipped-row button {
+    background: none; border: none; color: var(--amber); font-family: var(--mono);
+    font-size: 0.7rem; text-transform: uppercase; cursor: pointer; padding: 0;
+  }
+  .skipped-row button:hover { text-decoration: underline; }
+
+  .empty-state { max-width: 640px; margin-bottom: 1.5rem; }
+
+  .notif-card { max-width: 640px; display: flex; gap: 0.9rem; align-items: flex-start; }
+  .notif-card .bell { font-size: 1.2rem; }
+  .notif-card h3 { font-size: 1.05rem; margin-bottom: 0.3rem; }
+  .notif-card p { color: var(--slate); font-size: 0.9rem; margin: 0 0 1rem; }
+  #notif-status { font-family: var(--mono); font-size: 0.8rem; margin-top: 0.75rem; }
+
+  .onboard-backdrop { position: fixed; inset: 0; background: rgba(23,27,36,0.5); display: none; align-items: center; justify-content: center; padding: 1.5rem; z-index: 30; }
+  .onboard-backdrop.open { display: flex; }
+  .onboard-modal { background: var(--paper); border: 2px solid var(--ink); border-radius: var(--radius); padding: 2rem; max-width: 420px; width: 100%; }
+  .onboard-modal h2 { font-size: 1.5rem; margin-bottom: 0.75rem; }
+  .onboard-modal p { color: var(--slate); margin-bottom: 1.5rem; font-size: 0.95rem; }
+  .onboard-actions { display: flex; gap: 0.75rem; }
+  .onboard-actions .btn { flex: 1; justify-content: center; }
+  .onboard-step2 label { display: block; font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; color: var(--slate); margin: 1rem 0 0.4rem; }
+  .onboard-step2 select { width: 100%; padding: 0.6rem; border: 2px solid var(--ink); border-radius: var(--radius); font-family: var(--body); }
+</style>
+</head>
+<body>
+<div id="launch-splash">
+  <div class="ls-sticker" style="top:32%; left:10%; width:20vw; height:20vw; transform: rotate(-10deg);">
+    <svg viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="48" fill="#F3EFE6" stroke="#171B24" stroke-width="2.5"/>
+      <g transform="translate(50 52)">
+        <path d="M-20 -8 C-20 -22 -12 -30 0 -30 C12 -30 20 -22 20 -8 L20 22 C20 27 16 30 11 30 L-11 30 C-16 30 -20 27 -20 22 Z" fill="#E8A33C" stroke="#171B24" stroke-width="2.5"/>
+        <path d="M-9 -30 C-9 -36 -5 -40 0 -40 C5 -40 9 -36 9 -30" fill="none" stroke="#171B24" stroke-width="2.5" stroke-linecap="round"/>
+        <rect x="-13" y="-2" width="26" height="18" rx="4" fill="#F3EFE6" stroke="#171B24" stroke-width="2.2"/>
+        <line x1="-6" y1="-14" x2="-6" y2="-4" stroke="#171B24" stroke-width="2.2" stroke-linecap="round"/>
+        <line x1="6" y1="-14" x2="6" y2="-4" stroke="#171B24" stroke-width="2.2" stroke-linecap="round"/>
+      </g>
+    </svg>
+  </div>
+  <div class="ls-sticker" style="top:29%; left:66%; width:14vw; height:14vw; transform: rotate(12deg);">
+    <svg viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="48" fill="#F3EFE6" stroke="#171B24" stroke-width="2.5"/>
+      <g transform="translate(50 50)">
+        <rect x="-18" y="-24" width="36" height="48" rx="3" fill="#171B24"/>
+        <rect x="-14" y="-24" width="4" height="48" fill="#E8A33C"/>
+        <line x1="-4" y1="-14" x2="12" y2="-14" stroke="#F3EFE6" stroke-width="2" stroke-linecap="round"/>
+        <line x1="-4" y1="-6" x2="12" y2="-6" stroke="#F3EFE6" stroke-width="2" stroke-linecap="round"/>
+        <line x1="-4" y1="2" x2="12" y2="2" stroke="#F3EFE6" stroke-width="2" stroke-linecap="round"/>
+      </g>
+    </svg>
+  </div>
+  <div class="ls-sticker" style="top:43%; left:76%; width:13vw; height:13vw; transform: rotate(-18deg);">
+    <svg viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="48" fill="#F3EFE6" stroke="#171B24" stroke-width="2.5"/>
+      <g transform="translate(50 50) rotate(45)">
+        <rect x="-8" y="-30" width="16" height="46" rx="2" fill="#E8A33C" stroke="#171B24" stroke-width="2.2"/>
+        <path d="M-8 -30 L0 -42 L8 -30 Z" fill="#F3EFE6" stroke="#171B24" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M-3 -38 L3 -38 L0 -30 Z" fill="#171B24"/>
+        <rect x="-8" y="16" width="16" height="10" fill="#171B24"/>
+      </g>
+    </svg>
+  </div>
+  <div class="ls-sticker" style="top:45%; left:8%; width:12vw; height:12vw; transform: rotate(9deg);">
+    <svg viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="48" fill="#F3EFE6" stroke="#171B24" stroke-width="2.5"/>
+      <g transform="translate(50 52)">
+        <rect x="-6" y="-32" width="12" height="8" rx="2" fill="#171B24"/>
+        <path d="M-14 -22 C-14 -26 -10 -28 -6 -28 L6 -28 C10 -28 14 -26 14 -22 L14 22 C14 27 10 30 4 30 L-4 30 C-10 30 -14 27 -14 22 Z" fill="#171B24" stroke="#171B24" stroke-width="2"/>
+        <rect x="-14" y="-6" width="28" height="24" fill="#E8A33C"/>
+      </g>
+    </svg>
+  </div>
+  <div class="ls-sticker" style="top:55%; left:68%; width:17vw; height:17vw; transform: rotate(-8deg);">
+    <svg viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="48" fill="#F3EFE6" stroke="#171B24" stroke-width="2.5"/>
+      <g transform="translate(28 40)">
+        <path d="M0 24 C0 12 6 4 16 2 C22 0.5 28 4 32 8 C36 4 44 2 48 8 L48 24 C48 28 44 30 40 30 L4 30 C1 30 0 27 0 24 Z" fill="#E8A33C" stroke="#171B24" stroke-width="2.3" stroke-linejoin="round"/>
+        <path d="M0 24 L48 24" stroke="#171B24" stroke-width="2.3"/>
+        <path d="M6 24 L6 30 M14 24 L14 30 M22 24 L22 30 M30 24 L30 30" stroke="#171B24" stroke-width="2"/>
+      </g>
+    </svg>
+  </div>
+  <div class="ls-sticker" style="top:55%; left:9%; width:15vw; height:15vw; transform: rotate(15deg);">
+    <svg viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="48" fill="#F3EFE6" stroke="#171B24" stroke-width="2.5"/>
+      <g transform="translate(50 50)">
+        <rect x="-18" y="-26" width="36" height="52" rx="5" fill="#171B24"/>
+        <rect x="-13" y="-20" width="26" height="14" rx="2" fill="#E8A33C"/>
+        <circle cx="-9" cy="1" r="3" fill="#F3EFE6"/><circle cx="0" cy="1" r="3" fill="#F3EFE6"/><circle cx="9" cy="1" r="3" fill="#F3EFE6"/>
+        <circle cx="-9" cy="11" r="3" fill="#F3EFE6"/><circle cx="0" cy="11" r="3" fill="#F3EFE6"/><circle cx="9" cy="11" r="3" fill="#F3EFE6"/>
+        <circle cx="-9" cy="21" r="3" fill="#F3EFE6"/><circle cx="0" cy="21" r="3" fill="#F3EFE6"/><circle cx="9" cy="21" r="3" fill="#F3EFE6"/>
+      </g>
+    </svg>
+  </div>
+  <div class="ls-sticker" style="top:68%; left:40%; width:12vw; height:12vw; transform: rotate(-5deg);">
+    <svg viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="48" fill="#F3EFE6" stroke="#171B24" stroke-width="2.5"/>
+      <g transform="translate(50 52)">
+        <path d="M-22 0 C-22 -16 -12 -26 0 -26 C12 -26 22 -16 22 0 C18 -4 14 -6 11 0 C8 -6 4 -8 0 0 C-4 -8 -8 -6 -11 0 C-14 -6 -18 -4 -22 0 Z" fill="#E8A33C" stroke="#171B24" stroke-width="2.2" stroke-linejoin="round"/>
+        <line x1="0" y1="-26" x2="0" y2="20" stroke="#171B24" stroke-width="2.2"/>
+        <path d="M0 20 C0 25 5 26 8 22" fill="none" stroke="#171B24" stroke-width="2.2" stroke-linecap="round"/>
+      </g>
+    </svg>
+  </div>
+  <div class="ls-sticker" style="top:13%; left:50%; width:16vw; height:16vw; transform: rotate(6deg);">
+    <svg viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="48" fill="#F3EFE6" stroke="#171B24" stroke-width="2.5"/>
+      <g transform="translate(50 50)">
+        <rect x="-18" y="-16" width="36" height="24" rx="2" fill="#171B24"/>
+        <rect x="-15" y="-13" width="30" height="18" rx="1" fill="#E8A33C"/>
+        <path d="M-24 8 L24 8 L28 16 C28 18 27 19 25 19 L-25 19 C-27 19 -28 18 -28 16 Z" fill="#171B24"/>
+      </g>
+    </svg>
+  </div>
+  <div class="ls-sticker" style="top:12%; left:20%; width:13vw; height:13vw; transform: rotate(-14deg);">
+    <svg viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="48" fill="#F3EFE6" stroke="#171B24" stroke-width="2.5"/>
+      <g transform="translate(50 52)">
+        <path d="M-20 2 C-20 -16 -12 -26 0 -26 C12 -26 20 -16 20 2" fill="none" stroke="#171B24" stroke-width="3" stroke-linecap="round"/>
+        <rect x="-24" y="0" width="10" height="18" rx="4" fill="#E8A33C" stroke="#171B24" stroke-width="2.2"/>
+        <rect x="14" y="0" width="10" height="18" rx="4" fill="#E8A33C" stroke="#171B24" stroke-width="2.2"/>
+      </g>
+    </svg>
+  </div>
+  <div class="ls-sticker" style="top:16%; left:80%; width:11vw; height:11vw; transform: rotate(10deg);">
+    <svg viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="48" fill="#F3EFE6" stroke="#171B24" stroke-width="2.5"/>
+      <g transform="translate(50 54)">
+        <path d="M-14 -12 L12 -12 L10 16 C10 20 6 22 0 22 C-6 22 -10 20 -10 16 Z" fill="#E8A33C" stroke="#171B24" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M12 -8 C20 -8 20 4 12 4" fill="none" stroke="#171B24" stroke-width="2.2"/>
+        <path d="M-8 -18 C-8 -22 -4 -22 -4 -18 M-1 -18 C-1 -22 3 -22 3 -18 M6 -18 C6 -22 10 -22 10 -18" stroke="#171B24" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      </g>
+    </svg>
+  </div>
+  <div class="ls-sticker" style="top:66%; left:22%; width:10vw; height:10vw; transform: rotate(20deg);">
+    <svg viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="48" fill="#F3EFE6" stroke="#171B24" stroke-width="2.5"/>
+      <g transform="translate(50 50)">
+        <circle cx="-14" cy="-14" r="7" fill="none" stroke="#171B24" stroke-width="2.4"/>
+        <line x1="-9" y1="-9" x2="16" y2="16" stroke="#171B24" stroke-width="2.4" stroke-linecap="round"/>
+        <line x1="10" y1="10" x2="18" y2="2" stroke="#E8A33C" stroke-width="2.4" stroke-linecap="round"/>
+        <line x1="14" y1="14" x2="20" y2="8" stroke="#E8A33C" stroke-width="2.4" stroke-linecap="round"/>
+      </g>
+    </svg>
+  </div>
+  <div class="ls-sticker" style="top:70%; left:60%; width:10vw; height:10vw; transform: rotate(-10deg);">
+    <svg viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="48" fill="#F3EFE6" stroke="#171B24" stroke-width="2.5"/>
+      <g transform="translate(50 50)">
+        <rect x="-11" y="-22" width="22" height="44" rx="5" fill="#171B24"/>
+        <rect x="-8" y="-17" width="16" height="30" fill="#E8A33C"/>
+        <circle cx="0" cy="17" r="2" fill="#F3EFE6"/>
+      </g>
+    </svg>
+  </div>
+  <div class="ls-wordmark">bagr<span class="dot">.</span></div>
+</div>
+<script>
+  // Only a genuine cold launch (fresh app open) should show this — tapping
+  // "Today" from elsewhere in the app is a normal page load too, since this
+  // is a multi-page app, not a SPA. sessionStorage tells the two apart:
+  // it survives in-app navigation but resets when the app is actually
+  // closed and relaunched. Runs synchronously, before the rest of the body
+  // parses, so there's no flash of the overlay when it shouldn't show.
+  //
+  // The flag is set here, immediately — not after init() succeeds below —
+  // because "is this a fresh session" has nothing to do with whether the
+  // async session check later succeeds. Setting it only on success meant a
+  // slow or redirecting auth check could leave the flag never set, and the
+  // splash would keep reappearing on every load.
+  if (sessionStorage.getItem('bagr-launched')) {
+    document.getElementById('launch-splash').remove();
+  } else {
+    sessionStorage.setItem('bagr-launched', '1');
+  }
+</script>
+<div class="app-shell">
+  <nav class="app-nav"></nav>
+
+  <main class="app-main">
+    <p class="label" style="margin-bottom:0.6rem;">Next departure</p>
+    <h1 style="font-size:2.1rem; margin-bottom:0.5rem;">What you need next</h1>
+    <p style="color:var(--slate); margin-bottom:2rem;">Cross-checked against what's home right now.</p>
+
+    <div class="card brief-card" id="brief-card"><!-- populated by JS --></div>
+
+    <div id="stub-container"><!-- populated by JS --></div>
+
+    <div class="skipped-list" id="skipped-list"><!-- populated by JS --></div>
+
+    <div class="card notif-card">
+      <span class="bell">🔔</span>
+      <div style="flex:1;">
+        <h3>A gentler reminder</h3>
+        <p>Enable browser notifications and pick when Bagr should tap you if something's missing for tomorrow.</p>
+        <label for="notif-time" class="label" style="display:block; margin-bottom:0.4rem;">Remind me at</label>
+        <select id="notif-time" style="padding:0.6rem; border:2px solid var(--ink); border-radius:var(--radius); font-family:var(--body); margin-bottom:1rem;"></select>
+        <div>
+          <button class="btn outline" id="enable-notif-btn" onclick="enableNotifications()">Enable notifications</button>
+          <button class="btn amber" id="update-time-btn" style="display:none;" onclick="updateNotifTime()">Save time</button>
+        </div>
+        <div id="notif-status"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="onboard-backdrop" id="onboard-backdrop">
+  <div class="onboard-modal">
+    <div id="onboard-step1">
+      <h2>Quick one before we start</h2>
+      <p>Do you have separate timetables — e.g. Week A and Week B?</p>
+      <div class="onboard-actions">
+        <button class="btn outline" onclick="finishOnboarding(false)">No, just one</button>
+        <button class="btn amber" onclick="showOnboardStep2()">Yes, A/B weeks</button>
+      </div>
+    </div>
+    <div id="onboard-step2" class="onboard-step2" style="display:none;">
+      <h2>Got it — one more thing</h2>
+      <p>So Bagr knows which week is which, tell it what this week is.</p>
+      <label for="onboard-week">Is this week...</label>
+      <select id="onboard-week">
+        <option value="A">Week A</option>
+        <option value="B">Week B</option>
+      </select>
+      <div class="onboard-actions" style="margin-top:1.5rem;">
+        <button class="btn outline" onclick="showOnboardStep1()">Back</button>
+        <button class="btn amber" onclick="finishOnboarding(true)">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="shared.js?v=4"></script>
+<script>
+const VAPID_PUBLIC_KEY = 'BK_R-3kGaNHd-APrGqj8mrT-Y8xrfGMgjZSx_i7sjf2fyCr6LeppvrR__D6dcsuPHO_bQgJgLdIqyFQPb2VOqQk';
+let session, slots = [], items = [], bags = [], skips = [], profile = null;
+
+async function init() {
+  session = await requireSession();
+  if (!session) return; // redirecting to login — splash just rides along until navigation
+
+  try {
+    renderDrawerNav('today');
+    const userId = session.user.id;
+
+    const appliedDraft = await applyOnboardingDraft(userId);
+
+    [slots, items, profile, bags, skips] = await Promise.all([
+      fetchSlots(userId), fetchItems(userId), fetchProfile(userId), fetchBags(userId), fetchSkips(userId)
+    ]);
+
+    if (appliedDraft) {
+      // Onboarding already covered the A/B weeks question — skip straight to building the timetable
+      window.location.href = 'timetable.html';
+      return;
+    }
+
+    if (!profile || !profile.onboarded) {
+      document.getElementById('onboard-backdrop').classList.add('open');
+    }
+
+    renderBrief();
+    render();
+    renderSkippedList();
+    populateTimeOptions();
+    await reflectNotifPermission();
+  } finally {
+    // Real content is up (or we hit an error) — either way, stop masking the
+    // page behind the launch splash.
+    hideLaunchSplash();
+  }
+}
+
+function hideLaunchSplash() {
+  const el = document.getElementById('launch-splash');
+  if (!el) return;
+  el.classList.add('hide');
+  setTimeout(() => el.remove(), 400);
+}
+
+function showOnboardStep2() {
+  document.getElementById('onboard-step1').style.display = 'none';
+  document.getElementById('onboard-step2').style.display = 'block';
+}
+function showOnboardStep1() {
+  document.getElementById('onboard-step1').style.display = 'block';
+  document.getElementById('onboard-step2').style.display = 'none';
+}
+
+async function finishOnboarding(hasAbWeeks) {
+  const fields = { onboarded: true, has_ab_weeks: hasAbWeeks };
+  if (hasAbWeeks) {
+    fields.ab_reference_date = new Date().toISOString().slice(0, 10);
+    fields.ab_reference_week = document.getElementById('onboard-week').value;
+  }
+  await saveProfile(session.user.id, fields);
+  profile = { user_id: session.user.id, ...fields };
+  document.getElementById('onboard-backdrop').classList.remove('open');
+  render();
+}
+
+function populateTimeOptions() {
+  const select = document.getElementById('notif-time');
+  const opts = [];
+  for (let h = 0; h < 24; h++) {
+    const d = new Date();
+    d.setHours(h, 0, 0, 0);
+    const label = d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    opts.push(`<option value="${h}">${label}</option>`);
+  }
+  select.innerHTML = opts.join('');
+  select.value = 19; // default 7pm local until we know otherwise
+}
+
+function localHourToUtcHour(localHour) {
+  const d = new Date();
+  d.setHours(localHour, 0, 0, 0);
+  return d.getUTCHours();
+}
+
+function utcHourToLocalHour(utcHour) {
+  const d = new Date();
+  d.setUTCHours(utcHour, 0, 0, 0);
+  return d.getHours();
+}
+
+// Today's brief: what's needed for TODAY specifically (render()/upcoming below
+// only looks ahead from tomorrow), plus a nod to anything chronically forgotten.
+function greetingForHour(hour) {
+  if (hour < 12) return 'Good morning!';
+  if (hour < 18) return 'Good afternoon!';
+  return 'Good evening!';
+}
+
+function renderBrief() {
+  const card = document.getElementById('brief-card');
+  const now = new Date();
+  // After midday, today is basically over from a "what do I need to pack"
+  // standpoint — showing tomorrow instead means the brief is useful for the
+  // rest of the day, not just the morning.
+  const showingTomorrow = now.getHours() >= 12;
+  const targetDate = new Date(now);
+  if (showingTomorrow) targetDate.setDate(targetDate.getDate() + 1);
+
+  const heading = showingTomorrow ? 'Tomorrow' : greetingForHour(now.getHours());
+  const dayWord = showingTomorrow ? 'tomorrow' : 'today';
+  const targetIdx = (targetDate.getDay() + 6) % 7; // Mon=0
+  const dateStr = targetDate.toISOString().slice(0, 10);
+  const weekLetter = weekLetterForDate(profile, targetDate);
+
+  const daySlots = slots.filter(s =>
+    s.day_of_week === targetIdx &&
+    (weekLetter === null || s.week === null || s.week === weekLetter) &&
+    !isSlotSkipped(skips, s.id, dateStr)
+  );
+
+  const forgotten = items.filter(i => (i.missed_count || 0) >= 3);
+  const forgottenLine = forgotten.length
+    ? `<div class="forgotten-line">🔥 ${forgotten.length} item${forgotten.length > 1 ? 's' : ''} you often forget: ${forgotten.map(i => i.name).join(', ')}</div>`
+    : '';
+
+  if (!daySlots.length) {
+    card.innerHTML = `
+      <h3>${heading}</h3>
+      <p class="brief-empty" id="brief-status-line">Nothing on ${dayWord}'s timetable${weekLetter ? ` (week ${weekLetter})` : ''}. Nothing to grab ${showingTomorrow ? 'yet' : 'before you head out'}.</p>
+      ${forgottenLine}`;
+    maybeEnhanceBriefWithAI({ when: dayWord, daySlots: [], needed: [], missing: [], forgotten: forgotten.map(i => i.name), weekLetter });
+    return;
+  }
+
+  const neededIds = new Set(daySlots.flatMap(s => s.required_item_ids || []));
+  const needed = items.filter(i => neededIds.has(i.id));
+  // "Missing" now means the real thing this app exists to catch: it's still
+  // at home AND hasn't actually been put in the bag for this date yet.
+  // Location alone isn't enough — an item can sit at home, unpacked, for weeks.
+  const missing = needed.filter(i => i.location === 'home' && i.packed_for_date !== dateStr);
+
+  const rows = needed.length
+    ? needed.map(item => packItemRow(item, dateStr)).join('')
+    : `<div class="brief-empty">No items linked to ${dayWord}'s slots yet.</div>`;
+
+  card.innerHTML = `
+    <h3>${heading}${showingTomorrow ? ':' : ''} ${daySlots.map(s => s.label).join(' · ')}${weekLetter ? ` · week ${weekLetter}` : ''}</h3>
+    ${missing.length
+      ? `<p class="brief-status warn" id="brief-status-line">${missing.length} still home — ${showingTomorrow ? 'sort before tomorrow' : 'grab before you go'}</p>`
+      : `<p class="brief-status ok" id="brief-status-line">✓ Everything's packed for ${dayWord}</p>`}
+    ${rows}
+    ${forgottenLine}`;
+
+  maybeEnhanceBriefWithAI({
+    when: dayWord,
+    daySlots: daySlots.map(s => s.label),
+    needed: needed.map(i => i.name),
+    missing: missing.map(i => i.name),
+    forgotten: forgotten.map(i => i.name),
+    weekLetter
+  });
+}
+
+// Ultimate-only: ask the ai-brief edge function (backed by a free Hugging
+// Face model, not a paid API) to turn the template line above into a
+// natural sentence. Silently does nothing if the user isn't entitled, the
+// HF call is slow/cold-starting/rate-limited, or anything else goes wrong —
+// the plain template line already rendered is always a valid brief on its
+// own, so there's no loading state or error state to show here.
+async function maybeEnhanceBriefWithAI(payload) {
+  try {
+    const { data, error } = await sb.functions.invoke('ai-brief', { body: payload });
+    if (error || !data || !data.entitled || !data.brief) return;
+    const line = document.getElementById('brief-status-line');
+    if (line) {
+      line.textContent = data.brief;
+      line.classList.remove('warn', 'ok');
+    }
+  } catch (err) {
+    // Non-fatal — template brief stands.
+  }
+}
+
+// Human label for a day N days from now: "Tomorrow" for the very next day,
+// the weekday name within the coming week, and "Next <weekday>" beyond that
+// (relevant since the upcoming-days scan looks up to 2 weeks ahead, so the
+// same weekday can appear twice).
+function nextOccurrenceLabel(offset) {
+  if (offset === 1) return 'Tomorrow';
+  const d = new Date();
+  d.setDate(d.getDate() + offset);
+  const weekday = d.toLocaleDateString([], { weekday: 'long' });
+  return offset <= 6 ? weekday : `Next ${weekday}`;
+}
+
+function render() {
+  const todayIdx = (new Date().getDay() + 6) % 7; // Mon=0
+  const container = document.getElementById('stub-container');
+
+  // Find the next 1-2 upcoming days that have slots (skipping fully-skipped days, up to 2 weeks out)
+  const upcoming = [];
+  for (let offset = 1; offset <= 14 && upcoming.length < 2; offset++) {
+    const dayIdx = (todayIdx + offset) % 7;
+    const targetDate = new Date();
+    targetDate.setDate(targetDate.getDate() + offset);
+    const dateStr = targetDate.toISOString().slice(0, 10);
+    const weekLetter = weekLetterForDate(profile, targetDate);
+    const daySlots = slots.filter(s =>
+      s.day_of_week === dayIdx &&
+      (weekLetter === null || s.week === null || s.week === weekLetter) &&
+      !isSlotSkipped(skips, s.id, dateStr)
+    );
+    if (daySlots.length) upcoming.push({ dayIdx, daySlots, weekLetter, dateStr, label: nextOccurrenceLabel(offset) });
+  }
+
+  if (!upcoming.length) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">📦</div>
+        <h3>Your week is still open.</h3>
+        <p>Build out your timetable and the next things to pack will appear here.</p>
+        <a class="btn" href="timetable.html">Build timetable →</a>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = upcoming.map(({ dayIdx, daySlots, weekLetter, dateStr, label }) => {
+    const neededIds = new Set(daySlots.flatMap(s => s.required_item_ids || []));
+    const needed = items.filter(i => neededIds.has(i.id));
+    const rows = needed.length ? renderNeededRows(needed, dateStr) : `<div class="pack-item">No items linked to these slots yet</div>`;
+
+    const weekTag = weekLetter ? ` · week ${weekLetter}` : '';
+    const slotIds = daySlots.map(s => s.id).join(',');
+
+    return `
+      <div class="stub">
+        <div class="stub-main">
+          <div class="label">${label.toLowerCase()}${weekTag}</div>
+          <div class="stub-day">${daySlots.map(s => s.label).join(' · ')}</div>
+          ${rows}
+          <button class="skip-day-btn" onclick="skipDay('${dateStr}', [${slotIds}])">Skip this day →</button>
+        </div>
+        <div class="stub-stub">
+          <span class="label" style="writing-mode:vertical-rl;">BAGR</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+async function skipDay(dateStr, slotIds) {
+  await Promise.all(slotIds.map(id => skipSlotOnDate(session.user.id, id, dateStr)));
+  skips = await fetchSkips(session.user.id);
+  renderBrief();
+  render();
+  renderSkippedList();
+}
+
+function renderSkippedList() {
+  const container = document.getElementById('skipped-list');
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const upcomingSkips = skips
+    .filter(s => s.skip_date >= todayStr)
+    .sort((a, b) => a.skip_date.localeCompare(b.skip_date));
+
+  if (!upcomingSkips.length) { container.innerHTML = ''; return; }
+
+  container.innerHTML = `
+    <h4 class="label">Skipped</h4>
+    ${upcomingSkips.map(skip => {
+      const slot = slots.find(s => s.id === skip.slot_id);
+      const dateLabel = new Date(skip.skip_date + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+      return `
+        <div class="skipped-row">
+          <span>${slot ? slot.label : 'Slot'} — ${dateLabel}</span>
+          <button onclick="undoSkip(${skip.slot_id}, '${skip.skip_date}')">Undo</button>
+        </div>`;
+    }).join('')}
+  `;
+}
+
+async function undoSkip(slotId, dateStr) {
+  await unskipSlotOnDate(slotId, dateStr);
+  skips = await fetchSkips(session.user.id);
+  renderBrief();
+  render();
+  renderSkippedList();
+}
+
+// Renders one item as either a static "already with you" line (location is
+// 'away' — nothing to do today) or a tappable checkbox for the thing this
+// app actually exists to track: has it been put in the bag for THIS date yet.
+function packItemInner(item, dateStr) {
+  if (item.location !== 'home') {
+    return `<div class="pack-item have"><span class="dot-have"></span>${item.name} — with you</div>`;
+  }
+  const packed = item.packed_for_date === dateStr;
+  return `<button class="pack-item ${packed ? 'have' : ''}" onclick="toggleItemPacked(${item.id}, '${dateStr}')">
+      <span class="${packed ? 'dot-have' : 'dot-missing'}"></span>${item.name}${packed ? ' — packed ✓' : ' — tap once it\'s in the bag'}
+    </button>`;
+}
+
+function packItemRow(item, dateStr) {
+  return `<div class="brief-row">${packItemInner(item, dateStr)}</div>`;
+}
+
+async function toggleItemPacked(id, dateStr) {
+  const item = items.find(i => i.id === id);
+  if (!item) return;
+  const newDate = item.packed_for_date === dateStr ? null : dateStr;
+  await setItemPackedDate(id, newDate);
+  item.packed_for_date = newDate;
+  renderBrief();
+  render();
+}
+
+function renderNeededRows(needed, dateStr) {
+  const itemRow = item => packItemInner(item, dateStr);
+
+  const usedBagIds = new Set(needed.map(i => i.bag_id).filter(Boolean));
+  if (usedBagIds.size < 2) return needed.map(itemRow).join(''); // one bag or none — no need to group
+
+  const groups = bags.filter(b => usedBagIds.has(b.id)).map(bag => ({
+    bag, items: needed.filter(i => i.bag_id === bag.id)
+  }));
+  const unassigned = needed.filter(i => !i.bag_id || !bags.find(b => b.id === i.bag_id));
+  if (unassigned.length) groups.push({ bag: null, items: unassigned });
+
+  return groups.map(g => `
+    <div style="margin-top:0.6rem;">
+      <div style="font-family:var(--mono); font-size:0.7rem; text-transform:uppercase; color:var(--amber); margin-bottom:0.2rem;">
+        ${g.bag ? g.bag.name : 'Unassigned'}
+      </div>
+      ${g.items.map(itemRow).join('')}
+    </div>`).join('');
+}
+
+async function reflectNotifPermission() {
+  const status = document.getElementById('notif-status');
+  const enableBtn = document.getElementById('enable-notif-btn');
+  const updateBtn = document.getElementById('update-time-btn');
+  const select = document.getElementById('notif-time');
+
+  if (!('Notification' in window)) {
+    status.textContent = 'Notifications aren\'t supported in this browser.';
+    enableBtn.style.display = 'none';
+    return;
+  }
+
+  if (Notification.permission === 'denied') {
+    status.textContent = 'Blocked — enable notifications for this site in your browser settings.';
+    enableBtn.style.display = 'none';
+    return;
+  }
+
+  if (Notification.permission === 'granted') {
+    // Already granted — check if we actually have a saved subscription + time
+    const { data: existing } = await sb.from('push_subscriptions')
+      .select('notify_hour').eq('user_id', session.user.id).maybeSingle();
+    if (existing) {
+      select.value = utcHourToLocalHour(existing.notify_hour);
+      enableBtn.style.display = 'none';
+      updateBtn.style.display = '';
+      status.textContent = '✓ Notifications enabled.';
+      return;
+    }
+    // Permission granted but never actually subscribed (e.g. cleared DB) — let them (re)subscribe
+    enableBtn.textContent = 'Save & subscribe';
+  }
+}
+
+async function enableNotifications() {
+  const status = document.getElementById('notif-status');
+  const permission = await Notification.requestPermission();
+  if (permission !== 'granted') { reflectNotifPermission(); return; }
+
+  if ('serviceWorker' in navigator) {
+    const reg = await navigator.serviceWorker.register('sw.js');
+    const sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+    });
+    const localHour = parseInt(document.getElementById('notif-time').value, 10);
+    const { error } = await sb.from('push_subscriptions').upsert({
+      user_id: session.user.id,
+      subscription: sub.toJSON(),
+      notify_hour: localHourToUtcHour(localHour)
+    });
+    if (error) {
+      status.textContent = `Couldn't save your reminder time: ${error.message}`;
+      return;
+    }
+  }
+  reflectNotifPermission();
+}
+
+async function updateNotifTime() {
+  const status = document.getElementById('notif-status');
+  const localHour = parseInt(document.getElementById('notif-time').value, 10);
+  const { error } = await sb.from('push_subscriptions')
+    .update({ notify_hour: localHourToUtcHour(localHour) })
+    .eq('user_id', session.user.id);
+  status.textContent = error ? `Error: ${error.message}` : '✓ Reminder time updated.';
+}
+
+// Converts the VAPID public key into the byte format pushManager.subscribe expects
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = atob(base64);
+  return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+}
+
+init();
+</script>
+</body>
+</html>
